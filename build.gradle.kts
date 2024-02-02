@@ -31,7 +31,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     testImplementation(kotlin("test-junit"))
-    testImplementation("org.jetbrains.kotlinx:lincheck:2.14.1")
+    testImplementation("org.jetbrains.kotlinx:lincheck:2.24")
 }
 
 sourceSets["main"].java.setSrcDirs(listOf("src"))
@@ -40,4 +40,12 @@ sourceSets["test"].java.setSrcDirs(listOf("test"))
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<Test> {
+    jvmArgs(
+        "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
+        "--add-exports", "java.base/jdk.internal.util=ALL-UNNAMED",
+        "--add-exports", "java.base/sun.security.action=ALL-UNNAMED"
+    )
 }

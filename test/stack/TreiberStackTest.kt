@@ -5,7 +5,6 @@ import org.jetbrains.kotlinx.lincheck.*
 import org.jetbrains.kotlinx.lincheck.annotations.Operation
 import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.*
 import org.jetbrains.kotlinx.lincheck.strategy.stress.*
-import org.jetbrains.kotlinx.lincheck.verifier.VerifierState
 import org.junit.*
 
 class TreiberStackTest {
@@ -37,7 +36,7 @@ class TreiberStackTest {
         .check(this::class.java)
 }
 
-class IntStackSequential : VerifierState() {
+class IntStackSequential {
     private val q = ArrayDeque<Int>()
 
     fun push(x: Int) {
@@ -45,6 +44,4 @@ class IntStackSequential : VerifierState() {
     }
 
     fun pop(): Int? = q.removeLastOrNull()
-
-    override fun extractState() = q
 }
