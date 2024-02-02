@@ -9,9 +9,13 @@ class TreiberStack<E> {
      * Adds the specified element [x] to the stack.
      */
     fun push(x: E) {
-        val top = this.top.value
-        val newTop = Node(x, top)
-        this.top.value = newTop
+        while (true) {
+            val top = this.top.value
+            val newTop = Node(x, top)
+            if (this.top.compareAndSet(top, newTop)) {
+                break
+            }
+        }
     }
 
     /**
@@ -20,10 +24,12 @@ class TreiberStack<E> {
      * is empty.
      */
     fun pop(): E? {
-        val top = this.top.value
-        if (top == null) return null
-        this.top.value = top.next
-        return top.x
+        while (true) {
+            val top = this.top.value ?: return null
+            if (this.top.compareAndSet(top, top.next)) {
+                return top.x
+            }
+        }
     }
 }
 

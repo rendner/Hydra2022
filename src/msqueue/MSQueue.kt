@@ -18,9 +18,16 @@ class MSQueue<E> {
      */
     fun enqueue(x: E) {
         val newTail = Node(x)
-        val tail = this.tail.value
-        tail.next = newTail
-        this.tail.value = newTail
+        while (true) {
+            val tail = this.tail.value
+            if (tail.next.compareAndSet(null, newTail)) {
+                this.tail.compareAndSet(tail, newTail)
+                break
+            } else {
+                // required to guarantee Obstruction-freedom
+                tail.next.value?.let { this.tail.compareAndSet(tail, it) }
+            }
+        }
     }
 
     /**
@@ -29,14 +36,16 @@ class MSQueue<E> {
      * is empty.
      */
     fun dequeue(): E? {
-        val head = this.head.value
-        val headNext = head.next
-        if (headNext == null) return null
-        this.head.value = headNext
-        return headNext.x
+        while (true) {
+            val head = this.head.value
+            val headNext = head.next.value ?: return null
+            if (this.head.compareAndSet(head, headNext)) {
+                return headNext.x
+            }
+        }
     }
 }
 
 private class Node<E>(val x: E?) {
-    var next: Node<E>? = null
+    val next = atomic<Node<E>?>(null)
 }

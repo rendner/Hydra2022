@@ -9,6 +9,8 @@ Please see the example of the atomic counter implementation in `src/counter` to 
 Please complete the Treiber stack and Michael-Scott queue algorithms in the `src/stack` and `src/msqueue` folders.
 To check the implementations for correctness, run `./gradlew test --tests "stack.*"` and `./gradlew test --tests "msqueue.*"`, correspondingly.
 
+video: [Nikita Koval — Intro to Concurrent Programming 1/3: Classic Stack and Queue Algorithms](https://www.youtube.com/watch?v=_bny1Xp8qQo)
+
 ## 2. Modern Queues and Flat Combining
 Please complete the `Fetch-and-Add`-based queue implementation in `src/faaqueue` and implement a concurrent queue 
 that leverages the flat-combining technique in `src/fcqueue`.
