@@ -16,6 +16,9 @@ Please complete the `Fetch-and-Add`-based queue implementation in `src/faaqueue`
 that leverages the flat-combining technique in `src/fcqueue`.
 To run the tests, use `./gradlew test --tests "faaqueue.*"` and `./gradlew test --tests "fcqueue.*"`.
 
+video: [Nikita Koval — Intro to Concurrent Programming 2/3: Modern Queues and Flat Combining](https://www.youtube.com/watch?v=AnYLtOnp79Y)
+
+
 ## 3. Relaxed Data Structures for Parallel Algorithms
 Please make the classic Dijkstra algorithm concurrent with a Multi-Queue or Stealing Multi-Queue under the hood 
 in the `src/dijkstra` folder. To run the tests, use `./gradlew test --tests "dijkstra.*"`.

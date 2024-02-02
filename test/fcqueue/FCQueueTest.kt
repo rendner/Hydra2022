@@ -8,7 +8,7 @@ import org.jetbrains.kotlinx.lincheck.strategy.stress.*
 import org.junit.*
 
 class FCQueueTest {
-    private val q = FCQueue<Int>()
+    private val q = FCQueue<Int>(THREADS + 1)
 
     @Operation
     fun enqueue(x: Int): Unit = q.enqueue(x)
@@ -22,7 +22,8 @@ class FCQueueTest {
         .invocationsPerIteration(10_000)
         .threads(THREADS)
         .actorsPerThread(ACTORS_PER_THREAD)
-        .checkObstructionFreedom()
+        // The algorithm uses a look. Therefore, "Obstruction-freedom" can't be guaranteed.
+        //.checkObstructionFreedom()
         .sequentialSpecification(IntQueueSequential::class.java)
         .check(this::class.java)
 

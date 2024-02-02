@@ -1,8 +1,6 @@
 package faaqueue
 
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.atomicArrayOfNulls
+import kotlinx.atomicfu.*
 
 class FAAQueue<E> {
     private val head: AtomicRef<Segment> // Head pointer, similarly to the Michael-Scott queue (but the first node is _not_ sentinel)
@@ -11,25 +9,46 @@ class FAAQueue<E> {
     private val enqIdx = atomic(0L) // Global index for the next enqueue operation
     private val deqIdx = atomic(0L) // Global index for the next dequeue operation
 
+    private val poison = -1
+
     init {
         val firstNode = Segment(0)
         head = atomic(firstNode)
         tail = atomic(firstNode)
     }
 
+    private fun findSegment(start: Segment, id: Long): Segment {
+
+        var curr = start
+
+        while (curr.id < id) {
+            val sId = curr.id + 1
+            val newTail = Segment(sId)
+            curr.next.compareAndSet(null, newTail)
+
+            curr = curr.next.value!!
+        }
+
+        return curr
+    }
+
     /**
      * Adds the specified element [x] to the queue.
      */
     fun enqueue(x: E) {
-        val enqIdx = this.enqIdx.getAndIncrement()
-        var tail = this.tail.value
-        if (tail.id < enqIdx / SEGMENT_SIZE) {
-            if (tail.next == null) tail.next = Segment(tail.id + 1)
-            tail = tail.next!!
-            this.tail.value = tail
+        while (true) {
+            val tail = this.tail.value
+            val enqIdx = this.enqIdx.getAndIncrement()
+
+            val s = findSegment(tail, enqIdx / SEGMENT_SIZE)
+
+            if (s.id > tail.id) {
+                this.tail.compareAndSet(tail, s)
+            }
+
+            val i = (enqIdx % SEGMENT_SIZE).toInt()
+            if (s.elements[i].compareAndSet(null, x)) return
         }
-        val i = (enqIdx % SEGMENT_SIZE).toInt()
-        tail.elements[i].value = x
     }
 
     /**
@@ -39,20 +58,26 @@ class FAAQueue<E> {
      */
     @Suppress("UNCHECKED_CAST")
     fun dequeue(): E? {
-        if (enqIdx.value == deqIdx.value) return null
-        val deqIdx = this.deqIdx.getAndIncrement()
-        var head = this.head.value
-        if (head.id < deqIdx / SEGMENT_SIZE) {
-            head = head.next!!
-            this.head.value = head
+        while (true) {
+            if (deqIdx.value >= enqIdx.value) return null
+            val head = this.head.value
+            val deqIdx = this.deqIdx.getAndIncrement()
+
+            val s = findSegment(head, deqIdx / SEGMENT_SIZE)
+
+            if (s.id > head.id) {
+                this.head.compareAndSet(head, s)
+            }
+
+            val i = (deqIdx % SEGMENT_SIZE).toInt()
+            if (s.elements[i].compareAndSet(null, poison)) continue
+            return s.elements[i].value as E
         }
-        val i = (deqIdx % SEGMENT_SIZE).toInt()
-        return head.elements[i].value as E
     }
 }
 
 private class Segment(val id: Long) {
-    var next: Segment? = null
+    val next = atomic<Segment?>(null)
     val elements = atomicArrayOfNulls<Any>(SEGMENT_SIZE)
 }
 
