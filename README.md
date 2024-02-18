@@ -22,3 +22,5 @@ video: [Nikita Koval — Intro to Concurrent Programming 2/3: Modern Queues and 
 ## 3. Relaxed Data Structures for Parallel Algorithms
 Please make the classic Dijkstra algorithm concurrent with a Multi-Queue or Stealing Multi-Queue under the hood 
 in the `src/dijkstra` folder. To run the tests, use `./gradlew test --tests "dijkstra.*"`.
+
+video: [Nikita Koval — Intro to Concurrent Programming 3/3: Relaxed Data Structures for Parallel Algorithms](https://www.youtube.com/watch?v=4JMAZlI_a-I)

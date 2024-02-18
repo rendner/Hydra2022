@@ -95,8 +95,6 @@ fun shortestPathSequential(start: Node) {
     }
 }
 
-private val NODE_DISTANCE_COMPARATOR = Comparator<Node> { o1, o2 -> Integer.compare(o1!!.distance, o2!!.distance) }
-
 fun clearNodes(nodes: List<Node>) {
     nodes.forEach { it.distance = Int.MAX_VALUE }
 }
